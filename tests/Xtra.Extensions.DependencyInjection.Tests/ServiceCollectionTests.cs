@@ -47,6 +47,26 @@ public class ServiceCollectionTests
 
 
     [Fact]
+    public void ServiceCollection_AddFactory_OfResolvingDelegate()
+    {
+        var sc = new ServiceCollection();
+        sc.AddTransient<BarService>();
+        sc.AddFactory<ITestService>(
+            sp => new FooService {
+                Wrapped = sp.GetRequiredService<BarService>()
+            }
+        );
+
+        using var sp = sc.BuildServiceProvider();
+        var factory = sp.GetRequiredService<Func<ITestService>>();
+
+        Assert.IsType<FooService>(factory());
+        Assert.NotSame(factory(), factory());
+        Assert.NotSame(factory().Wrapped, factory().Wrapped);
+    }
+
+
+    [Fact]
     public void ServiceCollection_AddServiceBundle_WithGenerics()
     {
         var sc = new ServiceCollection();
@@ -104,11 +124,20 @@ public class ServiceCollectionTests
     }
 
 
-    private interface ITestService { }
+    private interface ITestService
+    {
+        ITestService Wrapped { get; set; }
+    }
 
 
-    private class FooService : ITestService { }
+    private class FooService : ITestService
+    {
+        public ITestService Wrapped { get; set; }
+    }
 
 
-    private class BarService : ITestService { }
+    private class BarService : ITestService
+    {
+        public ITestService Wrapped { get; set; }
+    }
 }
