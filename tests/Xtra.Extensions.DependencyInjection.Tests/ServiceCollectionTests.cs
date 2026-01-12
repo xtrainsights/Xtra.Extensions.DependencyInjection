@@ -112,6 +112,24 @@ public class ServiceCollectionTests
     }
 
 
+    [Fact]
+    public void ServiceCollection_AddServiceBundles_NullCheck()
+    {
+        var sc = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() => sc.AddServiceBundles((IServiceBundle[])null!));
+        Assert.Throws<ArgumentNullException>(() => sc.AddServiceBundles((IEnumerable<IServiceBundle>)null!));
+    }
+
+
+    [Fact]
+    public void ServiceCollection_AddFactory_NullCheck()
+    {
+        var sc = new ServiceCollection();
+        Assert.Throws<ArgumentNullException>(() => sc.AddFactory<FooService>((Func<FooService>)null!));
+        Assert.Throws<ArgumentNullException>(() => sc.AddFactory<FooService>((Func<IServiceProvider, FooService>)null!));
+    }
+
+
     private class FooBundle : IServiceBundle
     {
         public void Load(IServiceCollection services) => services.AddTransient<FooService>();
@@ -126,18 +144,18 @@ public class ServiceCollectionTests
 
     private interface ITestService
     {
-        ITestService Wrapped { get; set; }
+        ITestService? Wrapped { get; set; }
     }
 
 
     private class FooService : ITestService
     {
-        public ITestService Wrapped { get; set; }
+        public ITestService? Wrapped { get; set; }
     }
 
 
     private class BarService : ITestService
     {
-        public ITestService Wrapped { get; set; }
+        public ITestService? Wrapped { get; set; }
     }
 }
