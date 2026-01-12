@@ -1,7 +1,17 @@
-assembly-versioning-scheme: MajorMinorPatch
 mode: ContinuousDelivery
+tag-prefix: '[vV]'
+assembly-versioning-scheme: MajorMinorPatch
+major-version-bump-message: '\+semver:\s?(breaking|major)'
+minor-version-bump-message: '\+semver:\s?(feature|minor)'
+patch-version-bump-message: '\+semver:\s?(fix|patch)'
+no-bump-message: '\+semver:\s?(none|skip)'
+commit-message-incrementing: Enabled
+
 branches:
-  master:
+  main:
     regex: ^main$|^master$
-ignore:
-  sha: []
+    mode: ContinuousDelivery
+    label: 'pre'
+    increment: Patch
+    is-main-branch: true
+    track-merge-message: true
