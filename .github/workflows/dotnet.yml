@@ -32,28 +32,26 @@ jobs:
             10.x
 
       - name: Setup GitVersion
-        uses: gittools/actions/gitversion/setup@v3.1.1
+        uses: gittools/actions/gitversion/setup@v4.2.0
         with:
-          versionSpec: 5.x
+          versionSpec: 6.x
 
       - name: Execute GitVersion
-        uses: gittools/actions/gitversion/execute@v3.1.1
+        uses: gittools/actions/gitversion/execute@v4.2.0
         id: gitversion
-        with:
-          useConfigFile: true
 
       - name: Restore
         run: dotnet restore
 
       - name: Build
-        run: dotnet build -c ${{ env.buildConfiguration }} --no-restore -p:Version=${{ steps.gitversion.outputs.nuGetVersion }} -p:FileVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} -p:AssemblyVersion=1.0.0.0
-
+        run: dotnet build -c ${{ env.buildConfiguration }} --no-restore -p:Version=${{ steps.gitversion.outputs.semVer }} -p:FileVersion=${{ steps.gitversion.outputs.assemblySemFileVer }} -p:AssemblyVersion=1.0.0.0
+        
       - name: Test
         run: dotnet test -c ${{ env.buildConfiguration }} --no-build -v normal --filter FullyQualifiedName!~IntegrationTests
-
+        
       - name: Pack
-        run: dotnet pack -c ${{ env.buildConfiguration }} -p:PackageOutputPath="${{ github.workspace }}/artifacts/" -p:PackageVersion=${{ steps.gitversion.outputs.nuGetVersion }}
-
+        run: dotnet pack -c ${{ env.buildConfiguration }} -p:PackageOutputPath="${{ github.workspace }}/artifacts/" -p:PackageVersion=${{ steps.gitversion.outputs.semVer }}
+        
       - name: Upload
         uses: actions/upload-artifact@v6
         with:
